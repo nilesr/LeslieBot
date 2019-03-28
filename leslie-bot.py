@@ -10,6 +10,7 @@ db = BTEdb.Database("leslie-bot-cache.json")
 if not db.TableExists("main"): db.CreateTable("main")
 
 groupme_token = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+groupme_bot_id = "XXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 guild_id = 339858259617906710 # final destination
 channel_id = 542156512550977545 # #vt-bois
@@ -47,8 +48,7 @@ async def on_message(message):
     print("Discarding message from " + str(message.channel));
   data = {
       "text": message.author.display_name + ": " + message.content,
-      #"bot_id": "XXXXXXXXXXXXXXXXXXXXXXXXXX", # Not Leslie Bot
-      "bot_id": "XXXXXXXXXXXXXXXXXXXXXXXXXX", # Leslie Bot
+      "bot_id": groupme_bot_id,
       "attachments": [
         #{"type": "image", "url": "https://i.groupme.com/512x512.jpeg.cef5c0012cb846819203fb81d9ccb4ed"}
         ]
