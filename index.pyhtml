@@ -1,0 +1,15 @@
+<%!
+from pydbus import SystemBus
+import json
+%><%
+
+if d:
+	s = d
+else:
+	s = "Hey I'm Cool Guy. (Sorta)"
+
+bus = SystemBus()
+proxy = bus.get("xyz.niles.LeslieBot")
+proxy.RecvMessage(str(d))
+
+%>${s}
