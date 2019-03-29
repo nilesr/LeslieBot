@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 print('------')
 print("Logging in now...")
-import discord, asyncio
+import discord, asyncio, re
 from gi.repository import GLib
 from pydbus.generic import signal
 import pydbus, threading, time, requests, BTEdb, json
@@ -44,8 +44,16 @@ async def on_message(message):
   if message.author.bot:
     print("DISCARDING BOT MESSAGE FROM ", message.author)
     return
+  if type(message.channel) == discord.channel.DMChannel:
+    print("DISCARDING PRIVATE MESSAGE FROM", message.author)
+    return
   if not message.channel or message.channel.id != channel_id:
     print("Discarding message from " + str(message.channel));
+  while True:
+    m = re.search("<@!?([0-9]*)>", message.content)
+    if not m: break
+    user = message.channel.guild.get_member(int(m.group(1)))
+    message.content = message.content.replace(m.group(0), "@" + user.display_name)
   data = {
       "text": message.author.display_name + ": " + message.content,
       "bot_id": groupme_bot_id,
