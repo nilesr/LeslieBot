@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 print('------')
 print("Logging in now...")
 import discord, asyncio, re
