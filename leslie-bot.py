@@ -4,10 +4,7 @@ print("Logging in now...")
 import discord, asyncio, re
 from gi.repository import GLib
 from pydbus.generic import signal
-import pydbus, threading, time, requests, BTEdb, json
-
-db = BTEdb.Database("leslie-bot-cache.json")
-if not db.TableExists("main"): db.CreateTable("main")
+import pydbus, threading, time, requests, json
 
 groupme_token = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 groupme_bot_id = "XXXXXXXXXXXXXXXXXXXXXXXXXX"
@@ -38,14 +35,8 @@ def upload(url):
 
 @client.event
 async def on_message(message):
-  start = time.time()
-  #print("Author: ", message.author, type(message.author))
-  #print("Channel: ", message.channel, type(message.channel))
   if message.author.bot:
     print("DISCARDING BOT MESSAGE FROM ", message.author)
-    return
-  if type(message.channel) == discord.channel.DMChannel:
-    print("DISCARDING PRIVATE MESSAGE FROM", message.author)
     return
   if not message.channel or message.channel.id != channel_id:
     print("Discarding message from " + str(message.channel));
@@ -74,17 +65,7 @@ async def RecvMessage(string):
   if s["sender_type"] == "bot":
     print("DISCARDING RecvMessage SELF MESSAGE")
     return
-  rows = db.Select("main", id = s["sender_id"])
-  if len(rows) == 0:
-    rows = [{"name": s["sender_id"]}]
-    response = requests.get("https://api.groupme.com/v3/groups/" + s["group_id"] + "?token=" + groupme_token)
-    members = json.loads(response.text)["response"]["members"]
-    for m in members:
-      if m["user_id"] == s["sender_id"]:
-        db.Insert("main", id = s["sender_id"], name = m["nickname"])
-        rows = [{"name": m["nickname"]}]
-        break
-  nickname = rows[0]["name"]
+  nickname = s["name"]
   e = None
   for attachment in s["attachments"]:
     if attachment["type"] == "image":
@@ -100,7 +81,6 @@ class Listener():
     <interface name='xyz.niles.LeslieBot'>
       <method name='RecvMessage'>
         <arg type='s' name='a' direction='in'/>
-        <!--<arg type='s' name='response' direction='out'/>-->
       </method>
     </interface>
   </node>

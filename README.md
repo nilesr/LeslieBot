@@ -2,7 +2,7 @@
 
 ### Set Up
 
-Install prerequisites: discord.py rewrite, `BTEdb`, `python-gobject`
+Install prerequisites: discord.py rewrite, `python-gobject`
 
 Install and configure [mako-server](https://github.com/nilesr/mako-server) such that you can receive API posts
 
@@ -24,6 +24,4 @@ When a discord message is received, it will POST a message to the GroupMe bot AP
 
 When a GroupMe message is sent, GroupMe will send a POST request to the callback URL that you specified, the URL of `index.pyhtml`. `index.pyhtml` will then connect to dbus and invoke `RecvMessage` on `xyz.niles.LeslieBot`, passing it the json-encoded blob as an argument. The glib main loop, which is running on a background thread of `leslie-bot.py`, will then use the main thread's event loop to execute the global `RecvMessage` function in the async context that discord.py expects.
 
-The json blob that GroupMe posts to us does not include a username. `RecvMessage` will attempt to pull usernames from a local cache kept in `leslie-bot-cache.json`, but if a user ID is not in the cache, it will attempt to get the group information (and member names) from the GroupMe API (NOT the bot API), using the personal access token at the top of the file, and then save it in the cache.
-
-The personal access token is also used for uploading images to GroupMe
+The personal access token is used for uploading images to GroupMe
