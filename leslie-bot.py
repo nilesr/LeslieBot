@@ -49,6 +49,7 @@ async def on_message(message):
     return
   if not message.channel or message.channel.id != channel_id:
     print("Discarding message from " + str(message.channel));
+    return
   while True:
     m = re.search("<@!?([0-9]*)>", message.content)
     if not m: break
