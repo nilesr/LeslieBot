@@ -32,7 +32,7 @@ The personal access token is used for uploading images to GroupMe
 
 #### Custom Emojis
 
-The first time someone speaks in GroupMe, LeslieBot downloads their profile picture, resizes it to 32x32 and creates a custom emoji for them. If they change their profile picture, it will delete the old one and create a new one. If there are too many emojis in the guild (the default limit is 50), **it will crash**. You can replace the entirety of the `get_emoiji` function with `return ""` to disable this feature. 
+The first time someone speaks in GroupMe, LeslieBot downloads their profile picture, resizes it to 32x32 and creates a custom emoji for them. If they change their profile picture, it will delete the old one and create a new one. If there are too many emojis in the guild (the default limit is 50), **it will crash**. You can replace the entirety of the `get_emoji` function with `return ""` to disable this feature. 
 
 If you rename the custom emojis it will probably stop working until the user changes their profile picture. This is a design deficiency, not a technical problem, because I realized there was an easier way to store and retrieve the emojis way after I implemented it, but I'm too lazy to fix it.
 
