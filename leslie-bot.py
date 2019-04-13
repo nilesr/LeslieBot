@@ -4,16 +4,17 @@ print("Logging in now...")
 import discord, asyncio, re
 from gi.repository import GLib
 from pydbus.generic import signal
-import pydbus, threading, time, requests, json
+import pydbus, threading, time, requests, json, BTEdb, hashlib, io
+from PIL import Image
+
+db = BTEdb.Database("leslie-bot-cache.json")
+if not db.TableExists("main"): db.CreateTable("main")
 
 groupme_token = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 groupme_bot_id = "XXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 guild_id = 339858259617906710 # final destination
 channel_id = 542156512550977545 # #vt-bois
-
-#guild_id = 498691390683742208 # pixel
-#channel_id = 498691390683742210 # #general
 
 client = discord.Client()
 
@@ -33,6 +34,32 @@ def upload(url):
   j = json.loads(r.text)
   return j["payload"]["url"] + ".large"
 
+# key, user_id, emoji_id
+async def get_emoji(key, user_id, display_name):
+  results = db.Select("main", key = key);
+  if len(results) == 1:
+    return results[0]["emoji_id"]
+  guild = client.get_guild(guild_id)
+  old_emoji = db.Select("main", user_id = user_id)
+  if len(old_emoji) > 0:
+    e = client.get_emoji(int(old_emoji[0]["emoji_id"].split(":")[2].replace(">", "")))
+    if e:
+      print("Deleting emoji " + str(e))
+      await e.delete(reason = "User " + user_id + ", " + display_name + " has new profile picture")
+    db.Delete("main", user_id = user_id)
+  name = hashlib.md5(key.encode("utf-8")).hexdigest()[:6]
+  print("Creating emoji " + name + " for user "+user_id+", "+display_name+" with image from " + key)
+  data = requests.get(key)
+  image = Image.open(io.BytesIO(data.content))
+  image = image.resize((32, 32), Image.ANTIALIAS)
+  resized = io.BytesIO()
+  image.save(resized, format='PNG')
+  print(len(resized.getvalue()));
+  emoji = await guild.create_custom_emoji(name = name , image = resized.getvalue(), reason = "Leslie-Bot: New avatar for user ID " + user_id + ", name: " + display_name)
+  emoji_id = "<:{}:{}>".format(name, emoji.id);
+  db.Insert("main", key = key, user_id = user_id, emoji_id = emoji_id);
+  return emoji_id
+
 @client.event
 async def on_message(message):
   if message.author.bot:
@@ -46,6 +73,10 @@ async def on_message(message):
     if not m: break
     user = message.channel.guild.get_member(int(m.group(1)))
     message.content = message.content.replace(m.group(0), "@" + user.display_name)
+  while True:
+    m = re.search("<:([^:]*):\d+>", message.content)
+    if not m: break
+    message.content = message.content.replace(m.group(0), "(" + m.group(1) + " emoji)")
   data = {
       "text": message.author.display_name + ": " + message.content,
       "bot_id": groupme_bot_id,
@@ -71,7 +102,8 @@ async def RecvMessage(string):
     if attachment["type"] == "image":
       e = discord.Embed()
       e.set_image(url = attachment["url"])
-  await channel.send(nickname + ": " + s["text"], embed = e);
+  emoji = await get_emoji(s["avatar_url"], s["sender_id"], s["name"]) if s["sender_id"] != "system" else ""
+  await channel.send(emoji + "**" + nickname + "**: " + s["text"], embed = e);
 
 client_loop = asyncio.get_event_loop()
 
