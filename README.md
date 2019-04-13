@@ -1,5 +1,7 @@
 ## LeslieBot is a GroupMe ↔ Discord bridge
 
+![](ss.png)
+
 ### Set Up
 
 Install prerequisites: discord.py **rewrite branch**, `python-gobject`, `BTEdb` and `pillow`
