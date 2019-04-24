@@ -37,3 +37,10 @@ The first time someone speaks in GroupMe, LeslieBot downloads their profile pict
 If you rename the custom emojis it will probably stop working until the user changes their profile picture. This is a design deficiency, not a technical problem, because I realized there was an easier way to store and retrieve the emojis way after I implemented it, but I'm too lazy to fix it.
 
 If a user uses a custom emoji in the discord server, like :eevee:, it sends it to groupme as "(eevee emoji)"
+
+### Known bugs and mitigations
+
+- **Percent signs** If a bot tries to send a message with a percent sign (%) in it, GroupMe explodes and sends back a 500 error. Never figured out what causes this, but the bot will send 0⁄0 instead, which appears in most clients as the fraction 0/0 (may look vaguely like ⁰/₀). It prepends and appends a zero-width space, so 100% does not appear as ¹⁰⁰⁰/₀. This works unless someone sends more than two % characters in a row, I didn't really feel that it was worth fixing.
+
+- **Formatting** Discord supports italics, bold, and italics and bold using markdown, so \*italics\* for *italics*, \*\*bold\*\* for **bold**, and \*\*\*all three\*\*\* for ***all three***. GroupMe does not support this, but the bot will attempt to use some more obscure unicode codepoints to force it, like 𝘪𝘵𝘢𝘭𝘪𝘤𝘴, 𝗯𝗼𝗹𝗱, and 𝙗𝙤𝙡𝙙 𝙞𝙩𝙖𝙡𝙞𝙘𝙨. Some people with iPhones cannot see these symbols. If that's a problem, replace the implementation of `format` with just `return text;`
+
