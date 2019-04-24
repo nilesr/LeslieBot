@@ -16,6 +16,9 @@ groupme_bot_id = "XXXXXXXXXXXXXXXXXXXXXXXXXX"
 guild_id = 339858259617906710 # final destination
 channel_id = 542156512550977545 # #vt-bois
 
+#guild_id = 498691390683742208 # pixel
+#channel_id = 498691390683742210 # #general
+
 client = discord.Client()
 
 @client.event
@@ -33,6 +36,34 @@ def upload(url):
   print(r)
   j = json.loads(r.text)
   return j["payload"]["url"] + ".large"
+
+def apply_format(text, alphabet):
+  base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  result = ""
+  for c in text:
+    idx = base.find(c)
+    if idx >= 0:
+      result += alphabet[idx]
+    else:
+      result += c
+  return result
+def bold_italic(k): return apply_format(k, "𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕")
+def bold(k): return apply_format(k, "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭")
+def italic(k): return apply_format(k, "𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡")
+
+def format(text):
+  split = re.split('(\\*\\*\\*[^\\*]*\\*\\*\\*|\\*\\*[^\\*]*\\*\\*|\\*[^\\*]*\\*)', text)
+  result = ""
+  for k in split:
+    if k.startswith("***") and k.endswith("***"):
+      result += bold_italic(k[3:-3])
+    elif k.startswith("**") and k.endswith("**"):
+      result += bold(k[2:-2])
+    elif k.startswith("*") and k.endswith("*"):
+      result += italic(k[1:-1])
+    else:
+      result += k
+  return result
 
 # key, user_id, emoji_id
 async def get_emoji(key, user_id, display_name):
@@ -78,7 +109,7 @@ async def on_message(message):
     if not m: break
     message.content = message.content.replace(m.group(0), "(" + m.group(1) + " emoji)")
   data = {
-      "text": message.author.display_name + ": " + message.content,
+      "text": message.author.display_name + ": " + format(message.content),
       "bot_id": groupme_bot_id,
       "attachments": [
         #{"type": "image", "url": "https://i.groupme.com/512x512.jpeg.cef5c0012cb846819203fb81d9ccb4ed"}
@@ -86,7 +117,7 @@ async def on_message(message):
       }
   for em in message.attachments:
     data["attachments"].append({"type": "image", "url": upload(em.url)})
-  print(data)
+  data["text"] = data["text"].replace("%", chr(0x200b) + "0⁄0" + chr(0x200b));
   requests.post("https://api.groupme.com/v3/bots/post", json.dumps(data))
 
 
