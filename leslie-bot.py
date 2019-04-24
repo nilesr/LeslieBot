@@ -4,7 +4,7 @@ print("Logging in now...")
 import discord, asyncio, re
 from gi.repository import GLib
 from pydbus.generic import signal
-import pydbus, threading, time, requests, json, BTEdb, hashlib, io
+import pydbus, threading, time, requests, json, BTEdb, hashlib, io, string
 from PIL import Image
 
 db = BTEdb.Database("leslie-bot-cache.json")
