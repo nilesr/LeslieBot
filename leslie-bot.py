@@ -50,9 +50,11 @@ def apply_format(text, alphabet):
 def bold_italic(k): return apply_format(k, "𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕")
 def bold(k): return apply_format(k, "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭")
 def italic(k): return apply_format(k, "𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡")
+def underline(k): return apply_format(k, list(map(lambda c: c + chr(0x332), string.ascii_letters)))
+def strikethrough(k): return apply_format(k, list(map(lambda c: c + chr(0x336), string.ascii_letters)))
 
 def format(text):
-  split = re.split('(\\*\\*\\*[^\\*]*\\*\\*\\*|\\*\\*[^\\*]*\\*\\*|\\*[^\\*]*\\*)', text)
+  split = re.split('(~~[^~]*~~|___[^_]*___|__[^_]*__|_[^_]*_|\\*\\*\\*[^\\*]*\\*\\*\\*|\\*\\*[^\\*]*\\*\\*|\\*[^\\*]*\\*)', text)
   result = ""
   for k in split:
     if k.startswith("***") and k.endswith("***"):
@@ -61,6 +63,14 @@ def format(text):
       result += bold(k[2:-2])
     elif k.startswith("*") and k.endswith("*"):
       result += italic(k[1:-1])
+    elif k.startswith("___") and k.endswith("___"):
+      result += underline(italic(k[3:-3]))
+    elif k.startswith("__") and k.endswith("__"):
+      result += underline(k[2:-2])
+    elif k.startswith("_") and k.endswith("_"):
+      result += italic(k[1:-1])
+    elif k.startswith("~~") and k.endswith("~~"):
+      result += strikethrough(k[2:-2])
     else:
       result += k
   return result
