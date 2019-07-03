@@ -1,3 +1,5 @@
+# LeslieBot is no longer used, see [LeslieBot 2](https://github.com/nilesr/LeslieBot2)
+
 ## LeslieBot is a GroupMe ↔ Discord bridge
 
 ![](ss.png)
